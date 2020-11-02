@@ -3,15 +3,30 @@ const expressHandlebars = require('express-handlebars');
 const logger = require('morgan');
 const debug = require('debug')('meadowlark');
 const handlers = require('./lib/handlers');
+const weatherMiddlware = require('./lib/middleware/weather');
 
 const app = express();
 const port = process.env.PORT || 3e3;
 
-app.engine('handlebars', expressHandlebars({ defaultLayout: 'main' }));
-app.set('view engine', 'handlebars');
+app.set('view engine', 'hbs');
+app.engine('hbs', expressHandlebars({
+  defaultLayout: 'main',
+  extname: '.hbs',
+  helpers: {
+    section(name, options) {
+      if (!this._sections) {
+        this._sections = {};
+      }
+      this._sections[name] = options.fn(this);
+      return null;
+    }
+  }
+}));
 
 app.use(logger('dev'));
 app.use(express.static(`${__dirname}/public`));
+
+app.use(weatherMiddlware);
 
 app.get('/', handlers.home);
 app.get('/about', handlers.about);
