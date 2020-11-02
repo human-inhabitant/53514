@@ -7,6 +7,7 @@ const handlers = require('./lib/handlers');
 const app = express();
 const port = process.env.PORT || 3e3;
 
+app.disable('x-powered-by');
 app.engine('handlebars', expressHandlebars({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
@@ -15,6 +16,7 @@ app.use(express.static(`${__dirname}/public`));
 
 app.get('/', handlers.home);
 app.get('/about', handlers.about);
+app.get('/headers', handlers.headers);
 
 app.use(handlers.notFound);
 app.use(handlers.serverError);
